@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - ./db_data:/var/lib/mysql  # MySQLのデータを永続化するためのボリューム
+    restart: always  # コンテナが停止した場合に自動的に再起動
+    environment:
+      MYSQL_ROOT_PASSWORD: password  # MySQLのルートユーザーパスワード設定
+      MYSQL_DATABASE: wordpress  # 作成するデータベース名
+      MYSQL_USER: wordpress  # WordPress用のMySQLユーザー
+      MYSQL_PASSWORD: wordpress  # 上記ユーザーのパスワード
+
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - ./backend:/var/www/html  # WordPressのデータを永続化するためのボリューム
+    ports:
+      - "8000:80"  # ホストのポート8000をコンテナのポート80にマッピング
+    restart: always  # コンテナが停止した場合に自動的に再起動
+    depends_on:
+     - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306  # MySQLデータベースのホストとポート
+      WORDPRESS_DB_USER: wordpress  # MySQLデータベースのユーザー
+      WORDPRESS_DB_PASSWORD: wordpress  # 上記ユーザーのパスワード
+      WORDPRESS_DB_NAME: wordpress  # 使用するデータベース名
+
+volumes:
+  db_data:  # MySQLデータの永続化に使用するボリューム
+  wordpress_data:  # WordPressデータの永続化に使用するボリューム
